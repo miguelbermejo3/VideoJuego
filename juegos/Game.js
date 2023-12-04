@@ -17,21 +17,43 @@ export class Game extends Phaser.Scene{
         this.load.image('gameover','images/gameover.png');
         this.load.image('platform','images/platform.png');
         this.load.image('ball','images/ball.png')
-        this.load.image('bluebrick','images/bluebrick.png');
-        this.load.image('blackbrick','images/blackbrick.png');
-        this.load.image('greenbrick','images/greenbrick.png');
-        this.load.image('orangebrick','images/orangebrick.png');
+        this.load.image('bluebrick','images/brickBlue.png');
+        this.load.image('blackbrick','images/brickBlack.png');
+        this.load.image('greenbrick','images/brickGreen.png');
+        this.load.image('orangebrick','images/brickOrange.png');
+        this.load.image('congratulations','images/congratulations.png');
     }
 
     create(){
         //seteamos el sistema físico de bordes de rebote
         this.physics.world.setBoundsCollision(true,true,true,false);
         this.add.image(400,250,'background');
+        //imagen GameOver:
         this.gameOverImage=this.add.image(400,90,'gameover');
         this.gameOverImage.visible=false;
+        //imagen Congratulations
+        this.congratsImage=this.add.image(400,90,'congratulations');
+        this.congratsImage.visible=false;
+
 
         //llamamos al método que coloca el marcador
         this.scoreboard.create();
+
+        //colocamos los grupos de brick
+        this.bricks=this.physics.add.staticGroup({
+            key:['bluebrick','greenbrick','orangebrick','blackbrick'],
+                frameQuantity:1,
+                gridAlign:{
+                    width:10,
+                     height:4,
+                    cellWidth:67,
+                    cellHeight:34,
+                    x:112,
+                    y:100
+                            }
+
+             });
+
 
         this.platform= this.physics.add.image(400,460,'platform').setImmovable();
         this.platform.body.allowGravity=false;
@@ -49,6 +71,8 @@ export class Game extends Phaser.Scene{
         //this.ball.setVelocity(velocity,10)
         //se añade la colisión de la bola
         this.physics.add.collider(this.ball,this.platform,this.platformImpact,null,this);
+
+        this.physics.add.collider(this.ball,this.bricks,this.brickImpact,null,this);
         //se crea el rebote
         this.ball.setBounce(1);
         //contról de la escucha de los cursores
@@ -72,6 +96,8 @@ export class Game extends Phaser.Scene{
         }
         
         }
+         
+        
         else{
             this.platform.setVelocityX(0);
             if(this.ball.getData('glue')){
@@ -86,6 +112,7 @@ export class Game extends Phaser.Scene{
             console.log("fin de la partida...");
             this.gameOverImage.visible=true;
             this.scene.pause();
+            this.bricks.setvisible(false);
         }
         if(this.cursors.up.isDown){
             this.ball.setVelocity(-75,-300);
@@ -106,4 +133,21 @@ export class Game extends Phaser.Scene{
         }
 
     }
+
+//metodo que se llama cuando se ejecuta ua colisión entre la bola y los ladrillos.
+        brickImpact(ball,brick){ 
+    //eliminamos brick:
+    brick.disableBody(true,true);
+    //aumentamos marcador:
+    this.scoreboard.incrementPoints(10);
+
+    //comprobamos si el número de elementos de ladrillos ha llegado a cero:
+    if(this.bricks.countActive()==0){
+this.congratsImage.visible=true;
+this.scene.pause();
+    }
+
+}
+
+
 }
