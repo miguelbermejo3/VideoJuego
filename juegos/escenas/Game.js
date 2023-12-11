@@ -1,4 +1,4 @@
-import { ScoreBoard } from "./componentes/ScoreBoard.js";
+import { ScoreBoard } from "../componentes/ScoreBoard.js";
 
 
 
@@ -71,7 +71,7 @@ export class Game extends Phaser.Scene{
         //this.ball.setVelocity(velocity,10)
         //se añade la colisión de la bola
         this.physics.add.collider(this.ball,this.platform,this.platformImpact,null,this);
-
+             //añadimos grupo de ladrillos del grupo birck de la bola
         this.physics.add.collider(this.ball,this.bricks,this.brickImpact,null,this);
         //se crea el rebote
         this.ball.setBounce(1);
